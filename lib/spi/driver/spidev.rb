@@ -8,8 +8,8 @@ class SPI
       attr_reader :speed
 
       def initialize(args={})
-        #raise SPINoDevice, "No Device specified" if args[:device].nil?
-        #raise SPINoDevice, "Device #{args[:device]} not found" unless File.exists?(args[:device])
+        raise SPIException, "No Device specified" if args[:device].nil?
+        raise SPIException, "Device #{args[:device]} not found" unless File.exists?(args[:device])
         puts "Using Device #{args[:device]}"
         @device = File.open(args[:device])
         @mode=getMode
@@ -35,38 +35,41 @@ class SPI
       # TODO accessors for SPI_IOC_WR_LSB_FIRST and SPI_IOC_WR_MODE32
 
 
-      def xfer(txdata, length=0)
+      # By the length used will always be the greater of txdata.size and length.
+      # rxdata will be sized according to that maximum and txdata grown if needed
+      def xfer(txdata: [], length: 0)
+        # Ensure tx and rx buffers are the same size
         length = txdata.size if txdata.size > length
+        txdata += (Array.new(length-txdata.size) {0}) if length > txdata.size
+        rxdata  = (Array.new(length) { 0 })
         
         # TODO Use the bitstruct gem ?
         # https://rubygems.org/gems/bit-struct/versions/0.15.0
         # Or create a class to wrap access and pack/unpack
 
-        # struct spi_ioc_transfer
-        # txdata                  # __u64 (pointer to data)
-        rxdata= ' ' * length      # __u64 (pointer to data)
+        txdata_pack       = txdata.pack('C*')     # __u64 (pointer to data)
+        rxdata_pack       = rxdata.pack('C*')     # __u64 (pointer to data)
 
-        # length                  # __u32
-        speed             = 0     # __u32
+        # length                                  # __u32
+        speed             = 0                     # __u32
 
-        delay_usecs       = 0     # __u16
-        bits_per_word     = 0     # __u8
-        cs_change         = 0     # __u8
-        tx_nbits          = 0     # __u8
-        rx_nbits          = 0     # __u8
-        pad               = 0     # __u16
-  
+        delay_usecs       = 0                     # __u16
+        bits_per_word     = 0                     # __u8
+        cs_change         = 0                     # __u8
+        tx_nbits          = 0                     # __u8
+        rx_nbits          = 0                     # __u8
+        pad               = 0                     # __u16
+
+        txdata_p = [txdata_pack].pack('P').unpack('L!')[0] # 64bit pointer to txdata
+        rxdata_p = [rxdata_pack].pack('P').unpack('L!')[0] # 64bit pointer to rxdata
 
         # We might need to do something special with the txdata and rxdata pointers to make them 64 bit
-        data = [txdata, 0, rxdata, 0, length, speed, delay_usecs, bits_per_word, cs_change, tx_nbits, rx_nbits, pad].pack('PLPLLLSCCCCS')
+        data = [txdata_p, rxdata_p, length, speed, delay_usecs, bits_per_word, cs_change, tx_nbits, rx_nbits, pad].pack('QQLLSCCCCS')
 
-        require 'pp'
-        pp data
         # We're only going to handle one message at a time for now
         @device.ioctl(SPI_IOC_MESSAGE(1),data)
 
-        #rxdata = data.unpack('PPLLSCCCCS')[1]
-        return rxdata
+        return rxdata_pack.unpack('C*')
     
       end
 
