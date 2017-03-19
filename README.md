@@ -32,10 +32,27 @@ user@device:~ $ ls /dev/spi*
 /dev/spidev32766.0
 ```
 
+To use the default (SPIdev) driver you can specify
+```ruby
+require "bundler/setup"
+require "spi"
+s=SPI.new(device: '/dev/spidev32766.0')
+s.speed=500000
+s.xfer(txdata: [0x10,0x00])
+```
+Currently SPIdev is the only driver.
 
-Currently there's only one Driver (SPI::Driver::SPIdev) and it takes a device parameter.
 
-TODO: Write usage instructions here
+Simple Testing of just the SPIdev Driver with an RFM69
+```ruby
+require "bundler/setup"
+require "spi"
+require 'spi/driver/spidev'
+s=SPI::Driver::SPIdev.new(device: '/dev/spidev32766.0')
+s.speed=500000
+s.xfer(txdata: [0x10,0x00])
+```
+This should result in a 2 byte array with the 2nd value reporting 36 (0x24)
 
 
 ## Development
