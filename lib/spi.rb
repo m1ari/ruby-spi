@@ -15,9 +15,16 @@ class SPI
       @driver=SPI::Driver::SPIdev.new(device: '/dev/spidev32766.0')
     end
 
+    def speed
+      @driver.speed
+    end
 
-    def xfer(data,length=0)
-      @driver.xfer(data,length)
+    def speed=(speed)
+      @driver.speed=speed
+    end
+
+    def xfer(txdata: [], length: 0)
+      @driver.xfer(txdata: txdata, length: length)
     end
 
   end
