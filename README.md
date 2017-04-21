@@ -59,6 +59,12 @@ This should result in a 2 byte array with the 2nd value reporting 36 (0x24)
 ### C.H.I.P.
 https://bbs.nextthing.co/t/using-spi-on-chip-without-kernel-hack/15395
 
+In simple terms (assuming a more recent (december 2016 or later 4.4 image)
+```bash
+sudo mkdir -p /sys/kernel/config/device-tree/overlays/spi
+sudo cp /lib/firmware/nextthingco/chip/sample-spi.dtbo /sys/kernel/config/device-tree/overlays/spi/dtbo
+```
+
 ### Raspberry Pi
 
 ## Development
