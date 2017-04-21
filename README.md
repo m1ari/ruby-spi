@@ -55,6 +55,12 @@ s.xfer(txdata: [0x10,0x00])
 This should result in a 2 byte array with the 2nd value reporting 36 (0x24)
 
 
+## Enabling SPI
+### C.H.I.P.
+https://bbs.nextthing.co/t/using-spi-on-chip-without-kernel-hack/15395
+
+### Raspberry Pi
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
