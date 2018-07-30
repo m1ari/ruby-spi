@@ -12,7 +12,7 @@ class SPI
     if args[:driver].nil?
       require "spi/driver/spidev"
       @device = args[:device] or raise SPIException, "args[:device] required"
-      @driver=SPI::Driver::SPIdev.new(device: '/dev/spidev32766.0')
+      @driver = SPI::Driver::SPIdev.new(device: @device)
     end
 
     def speed

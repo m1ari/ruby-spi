@@ -10,7 +10,6 @@ class SPI
       def initialize(args={})
         raise SPIException, "No Device specified" if args[:device].nil?
         raise SPIException, "Device #{args[:device]} not found" unless File.exists?(args[:device])
-        puts "Using Device #{args[:device]}"
         @device = File.open(args[:device])
         @mode=getMode
         @bits=getBits
